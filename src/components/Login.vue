@@ -1,15 +1,59 @@
 <template>
   <div id="">
-
+    <div class='container auth-form'>
+      <div class="row">
+        <div class="col-8 offset-sm-2">
+          <div class="h1 text-primary">Log in</div>
+          <form @keyup.enter='log_in'>
+            <div class="alert alert-danger" v-if="errors">
+              {{ errors }}
+            </div>
+            <div class="form-group">
+              <input type="email" class="form-control" id="email" placeholder="Email" v-model='credentials.email'>
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" id="password" placeholder="Password" v-model='credentials.password'>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary" @click='log_in' >Log In</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-export default {
-  name: "",
-  data: () => ({
+import axios from 'axios'
 
-  })
+export default {
+  name: 'login',
+  data: () => ({
+    credentials: {
+      email: '',
+      password: ''
+    },
+    errors: ''
+  }),
+  methods: {
+    log_in() {
+      axios.post('http://localhost:3000/api/auth/sign_in', this.credentials)
+        .then(resp => {
+          this.$session.set('headers', resp.headers)
+          this.$router.push({ name: 'Home' })
+        })
+        .catch(e => {
+          this.errors = e
+        })
+    },
+    set_auth_headers(resp) {
+      this.$session.set('headers', resp.headers)
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
+.auth-form {
+  background-color: rgba(255, 255, 255, 0.3);
+}
 </style>
