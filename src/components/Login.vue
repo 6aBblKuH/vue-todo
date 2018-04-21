@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-8 offset-sm-2">
           <div class="h1 text-primary">Log in</div>
-          <form @keyup.enter='log_in'>
+          <form @keyup.enter='logIn'>
             <div class="alert alert-danger" v-if="errors">
               {{ errors }}
             </div>
@@ -15,7 +15,7 @@
               <input type="password" class="form-control" id="password" placeholder="Password" v-model='credentials.password'>
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-primary" @click='log_in' >Log In</button>
+              <button type="button" class="btn btn-primary" @click='logIn' >Log In</button>
             </div>
           </form>
         </div>
@@ -24,7 +24,7 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
+import * as authRequests from '@/api/auth'
 
 export default {
   name: 'login',
@@ -36,18 +36,12 @@ export default {
     errors: ''
   }),
   methods: {
-    log_in() {
-      axios.post('http://localhost:3000/api/auth/sign_in', this.credentials)
-        .then(resp => {
-          this.$session.set('headers', resp.headers)
-          this.$router.push({ name: 'Home' })
-        })
-        .catch(e => {
-          this.errors = e
-        })
-    },
-    set_auth_headers(resp) {
-      this.$session.set('headers', resp.headers)
+    logIn() {
+      authRequests.auth({credentials: this.credentials}).then(resp => {
+        this.$router.push({ name: 'Home' })
+      }).catch(e => {
+        this.errors = e.response.data.errors.join('\n')
+      })
     }
   }
 }
