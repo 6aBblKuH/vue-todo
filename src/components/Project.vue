@@ -13,7 +13,7 @@
                 class="form-control"
                 :aria-describedby="'rename-project-' + project.id"
                 :defaultValue='project.title'
-                v-model='edited_name'
+                v-model='editedName'
                 @keyup.enter='renameProject'>
               <div class="input-group-append">
                 <span class="input-group-text rename-project-btn cursor-pointer"
@@ -55,7 +55,11 @@
         </div>
       </div>
       <div class="row todo-block">
-        <todo v-for="todo in project.todos" :key="todo.id" :todo="todo" class="col-sm-12"></todo>
+        <todo v-for="todo in project.todos"
+          :key="todo.id"
+          :todo="todo"
+          @delete-todo='deleteTodo'
+          class="col-sm-12"></todo>
       </div>
     </div>
   </div>
@@ -71,18 +75,20 @@ export default {
   data: () => ({
     content: '',
     show_edit_name_block: false,
-    edited_name: ''
+    editedName: ''
   }),
 
   methods: {
     addTodo() {
+      if (!this.content) return false
       projectRequests.addTodo({project: this.project, content: this.content}).then(resp => {
         this.content = ''
         this.project.todos.push(resp.data)
       })
     },
     renameProject() {
-      projectRequests.renameProject({id: this.project.id, title: this.edited_name}).then(resp => {
+      if (!this.content) return false
+      projectRequests.renameProject({id: this.project.id, title: this.editedName}).then(resp => {
         this.project.title = resp.data.title
         this.toggleEditNameBlock()
       })
@@ -92,13 +98,17 @@ export default {
         this.$emit('delete-project', this.project)
       })
     },
+    deleteTodo(todo) {
+      const todoIndex = this.project.todos.indexOf(todo)
+      this.project.todos.splice(todoIndex, 1)
+    },
     toggleEditNameBlock() {
       this.show_edit_name_block = !this.show_edit_name_block
     }
   },
 
   mounted() {
-    this.edited_name = this.project.title
+    this.editedName = this.project.title
   },
 
   props: ['project'],
