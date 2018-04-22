@@ -1,10 +1,10 @@
 <template>
   <div id="">
-    <div class='container auth-form'>
+    <div class='container registration-form'>
       <div class="row">
         <div class="col-8 offset-sm-2">
-          <div class="h1 text-primary">Log in</div>
-          <form @keyup.enter='logIn'>
+          <div class="h1 text-primary">Sign up</div>
+          <form @keyup.enter='signUp'>
             <div class="alert alert-danger" v-if="errors">
               {{ errors }}
             </div>
@@ -15,8 +15,11 @@
               <input type="password" class="form-control" id="password" placeholder="Password" v-model='credentials.password'>
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-primary" @click='logIn' >Log In</button>
-              <router-link :to="{ name: 'Registration' }" class="btn btn-success">Registration</router-link>
+              <input type="password" class="form-control" id="password" placeholder="Confirm password" v-model='credentials.password_confirmation'>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary" @click='signUp' >Sign up</button>
+              <router-link :to="{ name: 'Login' }" class="btn btn-success">Login</router-link>
             </div>
           </form>
         </div>
@@ -24,31 +27,33 @@
     </div>
   </div>
 </template>
+
 <script>
-import * as authRequests from '@/api/auth'
+import * as registrationRequests from '@/api/registration'
 
 export default {
-  name: 'login',
+  name: 'registration',
+
   data: () => ({
     credentials: {
       email: '',
-      password: ''
+      password: '',
+      password_confirmation: ''
     },
     errors: ''
   }),
+
   methods: {
-    logIn() {
-      authRequests.auth({credentials: this.credentials}).then(resp => {
+    signUp() {
+      registrationRequests.registrate({credentials: this.credentials}).then(resp => {
         this.$router.push({ name: 'Home' })
-      }).catch(e => {
-        this.errors = e.response.data.errors.join('\n')
       })
     }
   }
 }
 </script>
 <style lang="scss" scoped>
-.auth-form {
+.registration-form {
   background-color: rgba(255, 255, 255, 0.3);
 }
 </style>
