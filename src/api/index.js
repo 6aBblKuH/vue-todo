@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseURL = process.env.NODE_ENV === 'production' ? 'your-domain' : 'http://localhost:3000/api/'
+const baseURL = process.env.NODE_ENV === 'production' ? 'https://todosio.herokuapp.com/api/' : 'http://localhost:3000/api/'
 
 const defaultTransformers = () => {
   const { transformRequest } = axios.defaults
