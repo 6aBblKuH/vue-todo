@@ -9,13 +9,13 @@
               {{ errors }}
             </div>
             <div class="form-group">
-              <input type="email" class="form-control" id="email" placeholder="Email" v-model='credentials.email'>
+              <input type="email" class="form-control" placeholder="Email" v-model='credentials.email'>
             </div>
             <div class="form-group">
-              <input type="password" class="form-control" id="password" placeholder="Password" v-model='credentials.password'>
+              <input type="password" class="form-control" placeholder="Password" v-model='credentials.password'>
             </div>
             <div class="form-group">
-              <input type="password" class="form-control" id="password" placeholder="Confirm password" v-model='credentials.password_confirmation'>
+              <input type="password" class="form-control" placeholder="Confirm password" v-model='credentials.password_confirmation'>
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-primary" @click='signUp' >Sign up</button>

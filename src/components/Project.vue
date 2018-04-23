@@ -55,11 +55,18 @@
         </div>
       </div>
       <div class="row todo-block">
-        <todo v-for="todo in project.todos"
-          :key="todo.id"
-          :todo="todo"
-          @delete-todo='deleteTodo'
-          class="col-sm-12"></todo>
+        <draggable v-model="todos"
+          @start="drag=true"
+          @end="drag=false"
+          class="col-sm-12"
+          @change='sortTodos'
+          :options="{ animation: 200 }">
+          <todo v-for="todo in todos"
+            :key="todo.id"
+            :todo="todo"
+            @delete-todo='deleteTodo'
+            class='row'></todo>
+        </draggable>
       </div>
     </div>
   </div>
@@ -68,6 +75,8 @@
 <script>
 import Todo from './Todo'
 import * as projectRequests from '@/api/project'
+import * as todoRequests from '@/api/todo'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'project',
@@ -75,7 +84,8 @@ export default {
   data: () => ({
     content: '',
     show_edit_name_block: false,
-    editedName: ''
+    editedName: '',
+    todos: []
   }),
 
   methods: {
@@ -83,7 +93,7 @@ export default {
       if (!this.content) return false
       projectRequests.addTodo({project: this.project, content: this.content}).then(resp => {
         this.content = ''
-        this.project.todos.push(resp.data)
+        this.todos.push(resp.data)
       })
     },
     renameProject() {
@@ -99,22 +109,31 @@ export default {
       })
     },
     deleteTodo(todo) {
-      const todoIndex = this.project.todos.indexOf(todo)
-      this.project.todos.splice(todoIndex, 1)
+      const todoIndex = this.todos.indexOf(todo)
+      this.todos.splice(todoIndex, 1)
     },
     toggleEditNameBlock() {
       this.show_edit_name_block = !this.show_edit_name_block
+    },
+    sortTodos() {
+      const sortedTodos = this.todos.map((todo, index) => {
+        todo.order = ++index
+        return { id: todo.id, order: todo.order }
+      })
+      todoRequests.sorting({projectId: this.project.id, todos: sortedTodos})
     }
   },
 
   mounted() {
     this.editedName = this.project.title
+    this.todos = this.project.todos.sort((first, second) => first.order - second.order)
   },
 
   props: ['project'],
 
   components: {
-    Todo
+    Todo,
+    Draggable
   }
 }
 </script>

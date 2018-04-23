@@ -1,38 +1,40 @@
 <template>
-  <div id="">
-    <div class="row todo">
-      <div class="col-sm-1">
-        <form>
-          <div class='checkbox-inline'>
-            <label>
-              <input type='checkbox' v-model='doneStatus' @click='changeDoneStatus'>
-            </label>
-          </div>
-        </form>
-      </div>
-      <div class="col-sm-9">
-        <div class="input-group" v-if="showEditTodoBlock">
-          <input type="text" class="form-control"
-            :aria-describedby="'edit-todo-' + todo.id"
-            @keyup.esc='toggleEditTodoBlock'
-            @keyup.enter='editTodoContent'
-            v-model='editedContent'>
-          <div class="input-group-append">
-            <span class="input-group-text" :id="'edit-todo-' + todo.id" @click='editTodoContent'>Edit todo</span>
-          </div>
+  <div>
+    <div class="col-sm-12">
+      <div class="row todo">
+        <div class="col-sm-1">
+          <form>
+            <div class='checkbox-inline'>
+              <label>
+                <input type='checkbox' v-model='doneStatus' @click='changeDoneStatus'>
+              </label>
+            </div>
+          </form>
         </div>
-        <span :style="doneStyles" v-else>{{ todo.content }}</span>
-      </div>
-      <div class="col-sm-2">
-        <div class="row">
-          <div class="col-sm-4">
+        <div class="col-sm-9 todo-content">
+          <div class="input-group" v-if="showEditTodoBlock">
+            <input type="text" class="form-control"
+              :aria-describedby="'edit-todo-' + todo.id"
+              @keyup.esc='toggleEditTodoBlock'
+              @keyup.enter='editTodoContent'
+              v-model='editedContent'>
+            <div class="input-group-append">
+              <span class="input-group-text" :id="'edit-todo-' + todo.id" @click='editTodoContent'>Edit todo</span>
+            </div>
+          </div>
+          <span :style="doneStyles" v-else>{{ todo.content }}</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="row">
+            <div class="col-sm-4">
 
-          </div>
-          <div class="col-sm-4">
-            <i class="fa fa-pencil cursor-pointer" @click='toggleEditTodoBlock'></i>
-          </div>
-          <div class="col-sm-4">
-            <i class="fa fa-trash cursor-pointer" @click='deleteTodo'></i>
+            </div>
+            <div class="col-sm-4">
+              <i class="fa fa-pencil cursor-pointer" @click='toggleEditTodoBlock'></i>
+            </div>
+            <div class="col-sm-4">
+              <i class="fa fa-trash cursor-pointer" @click='deleteTodo'></i>
+            </div>
           </div>
         </div>
       </div>
@@ -98,5 +100,9 @@ export default {
   padding: 15px 10px 5px;
   background-color: #fff;
   border-bottom: 1px solid #cfcfcf;
+
+  &-content {
+    cursor: move;
+  }
 }
 </style>
