@@ -27,7 +27,26 @@
         <div class="col-sm-2">
           <div class="row">
             <div class="col-sm-4">
-
+              <i class="fa fa-comment cursor-pointer" @click='openCommentsModal'></i>
+              <b-modal ref="commentsModal" title="Add Comment" hide-footer>
+                <div class="input-group">
+                  <input type="text"
+                    class="form-control"
+                    aria-describedby='add-comment'
+                    @keyup.enter='addComment'
+                    v-model='comment'
+                    placeholder='Enter Your Comment'>
+                  <div class="input-group-append">
+                    <span class="input-group-text btn btn-primary" id='add-comment' @click='addComment'>Add</span>
+                  </div>
+                </div>
+                <hr/>
+                <comment v-for="comment in comments"
+                  :key="comment.id"
+                  :comment='comment'
+                  :project-id='todo.project_id'
+                  @delete-comment='deleteComment(comment)'></comment>
+              </b-modal>
             </div>
             <div class="col-sm-4">
               <i class="fa fa-pencil cursor-pointer" @click='toggleEditTodoBlock'></i>
@@ -44,6 +63,10 @@
 
 <script>
 import * as todoRequests from '@/api/todo'
+import * as commentRequests from '@/api/comment'
+import bModal from 'bootstrap-vue/es/components/modal/modal'
+import bModalDirective from 'bootstrap-vue/es/directives/modal/modal'
+import Comment from './Comment'
 
 export default {
   name: 'todo',
@@ -51,8 +74,19 @@ export default {
   data: () => ({
     doneStatus: false,
     showEditTodoBlock: false,
-    editedContent: ''
+    editedContent: '',
+    comments: [],
+    comment: ''
   }),
+
+  beforeCreate() {
+    commentRequests.getComments({
+      projectId: this.$options.propsData.todo.project_id,
+      todoId: this.$options.propsData.todo.id
+    }).then(resp => {
+      this.comments = resp.data
+    })
+  },
 
   methods: {
     changeDoneStatus() {
@@ -80,6 +114,24 @@ export default {
     },
     toggleEditTodoBlock() {
       this.showEditTodoBlock = !this.showEditTodoBlock
+    },
+    openCommentsModal() {
+      this.$refs.commentsModal.show()
+    },
+    addComment() {
+      if (!this.comment) return false
+      commentRequests.addComment({
+        projectId: this.todo.project_id,
+        todoId: this.todo.id,
+        content: this.comment
+      }).then(resp => {
+        this.comments.push(resp.data)
+        this.comment = ''
+      })
+    },
+    deleteComment(comment) {
+      const commentIndex = this.comments.indexOf(comment)
+      this.comments.splice(commentIndex, 1)
     }
   },
 
@@ -90,6 +142,15 @@ export default {
 
   computed: {
     doneStyles: vm => ({ 'text-decoration': vm.doneStatus ? 'line-through' : 'none' })
+  },
+
+  components: {
+    'b-modal': bModal,
+    Comment
+  },
+
+  directives: {
+    'b-modal': bModalDirective
   },
 
   props: ['todo']

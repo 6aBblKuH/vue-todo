@@ -7,7 +7,6 @@
         </div>
         <div class="col-sm-8 project-title">
           <div class="" v-if="show_edit_name_block">
-
             <div class="input-group">
               <input type="text"
                 class="form-control"
@@ -21,7 +20,6 @@
                   @click='renameProject'>Rename</span>
               </div>
             </div>
-
           </div>
           <div class="" v-else>{{ project.title }}</div>
         </div>
@@ -97,7 +95,7 @@ export default {
       })
     },
     renameProject() {
-      if (!this.content) return false
+      if (!this.editedName) return false
       projectRequests.renameProject({id: this.project.id, title: this.editedName}).then(resp => {
         this.project.title = resp.data.title
         this.toggleEditNameBlock()

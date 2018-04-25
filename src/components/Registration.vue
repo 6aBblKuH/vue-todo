@@ -47,6 +47,8 @@ export default {
     signUp() {
       registrationRequests.registrate({credentials: this.credentials}).then(resp => {
         this.$router.push({ name: 'Home' })
+      }).catch(e => {
+        this.errors = e.response.data.errors.join('\n')
       })
     }
   }
