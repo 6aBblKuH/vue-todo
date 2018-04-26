@@ -27,19 +27,29 @@
         <div class="col-sm-2">
           <div class="row">
             <div class="col-sm-4">
+              {{ this.comments.length }}
               <i class="fa fa-comment cursor-pointer" @click='openCommentsModal'></i>
               <b-modal ref="commentsModal" title="Add Comment" hide-footer>
-                <div class="input-group">
-                  <input type="text"
-                    class="form-control"
-                    aria-describedby='add-comment'
-                    @keyup.enter='addComment'
-                    v-model='comment'
-                    placeholder='Enter Your Comment'>
-                  <div class="input-group-append">
-                    <span class="input-group-text btn btn-primary" id='add-comment' @click='addComment'>Add</span>
+                <form @submit.prevent='addComment'>
+                  <div class="form-group">
+                    <input type="text"
+                      class="form-control"
+                      aria-describedby='add-comment'
+                      v-model='comment'
+                      name='content'
+                      placeholder='Enter Your Comment'>
                   </div>
-                </div>
+                  <div class="form-group">
+                    <input type="file"
+                      class="form-control"
+                      ref='fileinput'
+                      name='file'>
+                  </div>
+                  <div class="form-group">
+                    <button class='btn btn-primary'>Save</button>
+                    <button class='btn btn-danger' @click='resetComment'>Cancel</button>
+                  </div>
+                </form>
                 <hr/>
                 <comment v-for="comment in comments"
                   :key="comment.id"
@@ -73,10 +83,12 @@ export default {
 
   data: () => ({
     doneStatus: false,
+    headers: null,
     showEditTodoBlock: false,
     editedContent: '',
     comments: [],
-    comment: ''
+    comment: '',
+    file: null
   }),
 
   beforeCreate() {
@@ -118,26 +130,35 @@ export default {
     openCommentsModal() {
       this.$refs.commentsModal.show()
     },
-    addComment() {
+    addComment(e) {
       if (!this.comment) return false
+      let formData = new FormData()
+      formData.append('content', this.comment)
+      formData.append('file', this.$refs.fileinput.files[0])
+
       commentRequests.addComment({
         projectId: this.todo.project_id,
         todoId: this.todo.id,
-        content: this.comment
+        data: formData
       }).then(resp => {
         this.comments.push(resp.data)
-        this.comment = ''
+        this.resetComment()
       })
     },
     deleteComment(comment) {
       const commentIndex = this.comments.indexOf(comment)
       this.comments.splice(commentIndex, 1)
+    },
+    resetComment() {
+      this.comment = ''
+      this.$refs.fileinput.value = null
     }
   },
 
   mounted() {
     this.editedContent = this.todo.content
     this.doneStatus = this.todo.is_done
+    this.headers = JSON.parse(localStorage.getItem('headers'))
   },
 
   computed: {

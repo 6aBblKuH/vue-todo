@@ -26,7 +26,8 @@ const defaultResponseTransformers = () => {
 export default axios.create({
   baseURL,
   transformRequest: [...defaultTransformers(), function(data, headers) {
-    const localHeaders = JSON.parse(localStorage.getItem('headers')) || {}
+    let localHeaders = JSON.parse(localStorage.getItem('headers')) || {}
+    delete localHeaders['content-type']
     Object.keys(localHeaders).forEach(key => {
       headers[key] = localHeaders[key]
     })
