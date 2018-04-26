@@ -58,10 +58,21 @@
                   @delete-comment='deleteComment(comment)'></comment>
               </b-modal>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-2">
+              <i class="fa fa-calendar cursor-pointer" @click="openDeadlineModal"></i>
+              <b-modal ref="deadlineModal" title="Set Deadline" hide-footer>
+                <div class="form-group">
+                  <input type="date" class="form-control" v-model='deadline'/>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-primary" @click='setDeadline'>Set deadline</button>
+                </div>
+              </b-modal>
+            </div>
+            <div class="col-sm-3">
               <i class="fa fa-pencil cursor-pointer" @click='toggleEditTodoBlock'></i>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <i class="fa fa-trash cursor-pointer" @click='deleteTodo'></i>
             </div>
           </div>
@@ -83,7 +94,7 @@ export default {
 
   data: () => ({
     doneStatus: false,
-    headers: null,
+    deadline: '',
     showEditTodoBlock: false,
     editedContent: '',
     comments: [],
@@ -119,6 +130,16 @@ export default {
         this.toggleEditTodoBlock()
       })
     },
+    setDeadline() {
+      todoRequests.setDeadline({
+        projectId: this.todo.project_id,
+        todoId: this.todo.id,
+        expiration_date: this.deadline
+      }).then(resp => {
+        this.todo.expiration_date = resp.data.expiration_date
+        this.$refs.deadlineModal.hide()
+      })
+    },
     deleteTodo() {
       todoRequests.deleteTodo({projectId: this.todo.project_id, todoId: this.todo.id}).then(resp => {
         this.$emit('delete-todo', this.todo)
@@ -129,6 +150,9 @@ export default {
     },
     openCommentsModal() {
       this.$refs.commentsModal.show()
+    },
+    openDeadlineModal() {
+      this.$refs.deadlineModal.show()
     },
     addComment(e) {
       if (!this.comment) return false
@@ -158,7 +182,7 @@ export default {
   mounted() {
     this.editedContent = this.todo.content
     this.doneStatus = this.todo.is_done
-    this.headers = JSON.parse(localStorage.getItem('headers'))
+    this.deadline = this.todo.expiration_date
   },
 
   computed: {
