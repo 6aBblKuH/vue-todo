@@ -5,17 +5,26 @@
         <div class="col-8 offset-sm-2">
           <div class="h1 text-primary">Sign up</div>
           <form @keyup.enter='signUp'>
-            <div class="alert alert-danger" v-if="errors">
-              {{ errors }}
+            <div class="alert alert-danger" v-if="errors" >
+              <div v-for="error in errors">{{ error }}</div>
             </div>
             <div class="form-group">
-              <input type="email" class="form-control" placeholder="Email" v-model='credentials.email'>
+              <input type="email"
+                class="form-control"
+                placeholder="Email"
+                v-model='credentials.email'>
             </div>
             <div class="form-group">
-              <input type="password" class="form-control" placeholder="Password" v-model='credentials.password'>
+              <input type="password"
+                class="form-control"
+                placeholder="Password"
+                v-model='credentials.password'>
             </div>
             <div class="form-group">
-              <input type="password" class="form-control" placeholder="Confirm password" v-model='credentials.password_confirmation'>
+              <input type="password"
+                class="form-control"
+                placeholder="Confirm password"
+                v-model='credentials.password_confirmation'>
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-primary" @click='signUp' >Sign up</button>
@@ -48,7 +57,7 @@ export default {
       registrationRequests.registrate({credentials: this.credentials}).then(resp => {
         this.$router.push({ name: 'Home' })
       }).catch(e => {
-        this.errors = e.response.data.errors.join('\n')
+        this.errors = e.response.data.errors.full_messages
       })
     }
   }
