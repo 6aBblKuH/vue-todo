@@ -31,6 +31,9 @@
               <i class="fa fa-comment cursor-pointer" @click='openCommentsModal'></i>
               <b-modal ref="commentsModal" title="Add Comment" hide-footer>
                 <form @submit.prevent='addComment'>
+                  <div class="alert alert-danger" v-if="addCommentErrors">
+                    <div v-for="error in addCommentErrors">{{ error }}</div>
+                  </div>
                   <div class="form-group">
                     <input type="text"
                       class="form-control"
@@ -43,7 +46,8 @@
                     <input type="file"
                       class="form-control"
                       ref='fileinput'
-                      name='file'>
+                      name='file'
+                      accept=".jpg, .png">
                   </div>
                   <div class="form-group">
                     <button class='btn btn-primary'>Save</button>
@@ -99,6 +103,7 @@ export default {
     editedContent: '',
     comments: [],
     comment: '',
+    addCommentErrors: null,
     file: null
   }),
 
@@ -167,6 +172,8 @@ export default {
       }).then(resp => {
         this.comments.push(resp.data)
         this.resetComment()
+      }).catch(e => {
+        this.addCommentErrors = e.response.data.errors
       })
     },
     deleteComment(comment) {
